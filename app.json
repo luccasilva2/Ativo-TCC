@@ -1,0 +1,50 @@
+{
+  "expo": {
+    "name": "Ativo",
+    "slug": "ativo",
+    "version": "1.0.1",
+    "icon": "./assets/icon.png",
+    "orientation": "portrait",
+    "userInterfaceStyle": "light",
+    "splash": {
+      "image": "./assets/splash.png",
+      "resizeMode": "contain",
+      "backgroundColor": "#fff"
+    },
+    "assetBundlePatterns": [
+      "**/*"
+    ],
+    "ios": {
+      "supportsTablet": true,
+      "bundleIdentifier": "com.luccasilva.ativo",
+      "buildNumber": "1.0.0" 
+    },
+    "android": {
+      "splash": {
+        "image": "./assets/splash.png",
+        "resizeMode": "contain",
+        "backgroundColor": "#fff",
+        "icon": "./assets/icon.png",
+        "adaptiveIcon": {
+          "foregroundImage": "./assets/adaptive-icon.png",
+          "backgroundColor": "#ffffff"
+        },
+        "package": "com.luccasilva.ativo"
+      },
+      "web": {},
+      "extra": {
+        "eas": {
+          "projectId": "528af537-0887-4895-8edf-09d10caf476b"
+        }
+      },
+      "owner": "lucca_s_oliveira",
+      "package": "com.luccasilva.ativo"
+    },
+    "extra": {
+      "eas": {
+        "projectId": "528af537-0887-4895-8edf-09d10caf476b"
+      }
+    },
+    "owner": "lucca_s_oliveira"
+  }
+}
