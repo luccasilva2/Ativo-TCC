@@ -103,10 +103,7 @@ export default function Home() {
                 <View style={styles.buttonContainer3}>
                   <View style={styles.buttonWrapper3}>
                     <TouchableOpacity style={styles.button5} onPress={() => navigation.navigate("informacoes")}>
-                      <Text style={styles.buttonText5}>Informações</Text>
-                    </TouchableOpacity>
-                    <TouchableOpacity style={styles.button6} onPress={() => navigation.navigate("alterarnome")}>
-                      <Text style={styles.buttonText6}>Gasto</Text>
+                      <Text style={styles.buttonText5}>Informações básicas</Text>
                     </TouchableOpacity>
 
                           </View>
@@ -309,24 +306,10 @@ const styles = StyleSheet.create({
     borderColor: '#fff',
     marginBottom: 20,
     marginTop: 110,
-    width: 160,
+    width: 335,
     height: 50,
     marginLeft: -345,
     marginRight: 8,
-  },
-  button6: {
-    backgroundColor: 'black',
-    paddingVertical: 10,
-    paddingHorizontal: 20,
-    borderRadius: 5,
-    marginVertical: 10,
-    borderWidth: 2,
-    borderColor: '#fff',
-    marginLeft: 8,
-    marginBottom: 20,
-    marginTop: 110,
-    width: 160, 
-    height: 50,
   },
   buttonText1: {
     color: '#fff',
@@ -351,11 +334,6 @@ const styles = StyleSheet.create({
     textAlign: 'center',
   },
   buttonText5: {
-    color: '#fff',
-    fontSize: 16,
-    textAlign: 'center',
-  },
-  buttonText6: {
     color: '#fff',
     fontSize: 16,
     textAlign: 'center',

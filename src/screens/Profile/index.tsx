@@ -103,12 +103,15 @@ export default function Profile() {
           <View style={styles.middleContainer}>
           </View>
           <View style={styles.bottomContainer}>
-            <TouchableOpacity
-              style={styles.bottomButton}
-              onPress={handleDeleteUser}
-            >
-              <Text style={styles.bottomButtonText}>Excluir conta</Text>
-            </TouchableOpacity>
+          <TouchableOpacity
+            style={styles.bottomButton}
+            onPress={() => {
+              handleDeleteUser();
+              navigation.navigate('initial');
+            }}
+          >
+            <Text style={styles.bottomButtonText}>Excluir conta</Text>
+          </TouchableOpacity>
             <TouchableOpacity
               style={styles.bottomButton}
               onPress={handleSessao}

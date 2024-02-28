@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import {
   StyleSheet,
   Text,
@@ -8,8 +8,22 @@ import {
   Image,
 } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
+import { useNavigation } from '@react-navigation/native';
 
-const operators = {
+interface Operators {
+  clearEntry: string;
+  clear: string;
+  backspace: string;
+  decimal: string;
+  sign: string;
+  add: string;
+  subtract: string;
+  multiply: string;
+  divide: string;
+  equals: string;
+}
+
+const operators: Operators = {
   clearEntry: 'CE',
   clear: 'C',
   backspace: '⌫',
@@ -19,45 +33,47 @@ const operators = {
   subtract: '−',
   multiply: '×',
   divide: '÷',
-  equals: ':',
+  equals: '=',
 };
 
-const calc = {
+interface CalcState {
+  stackValue: number;
+  pendingOperator: string;
+  decimalPressed: boolean;
+  showingPreviousResult: boolean;
+}
+
+const calc: CalcState = {
   stackValue: NaN,
   pendingOperator: '',
   decimalPressed: false,
   showingPreviousResult: false,
 };
 
-class CalcButton extends React.Component<{ name: string, onPress: (name: string) => void }> {
-  render() {
-    return (
-      <TouchableHighlight
-        style={[
-          styles.button,
-          !isNaN(Number(this.props.name)) && styles.buttonNumeric,
-        ]}
-        onPress={() => this.props.onPress(this.props.name)}>
-        <Text style={styles.buttonText}>{this.props.name}</Text>
-      </TouchableHighlight>
-    );
-  }
-}
+const CalcButton = ({ name, onPress }: { name: string; onPress: (name: string) => void }) => (
+  <TouchableHighlight
+    style={[
+      styles.button,
+      !isNaN(Number(name)) && styles.buttonNumeric,
+    ]}
+    onPress={() => onPress(name)}>
+    <Text style={styles.buttonText}>{name}</Text>
+  </TouchableHighlight>
+);
 
-export default class Calculadora extends React.Component {
-  state = {
-    displayText: '0',
-  };
+const Calculadora = () => {
+  const [displayText, setDisplayText] = useState<string>('0');
+  const navigation = useNavigation();
 
-  buttonPress = (btn: string) => {
-    let text = this.state.displayText;
+  const buttonPress = (btn: string) => {
+    let text = displayText;
 
     if (btn === operators.clearEntry) {
-      this.clearEntry();
+      clearEntry();
     } else if (btn === operators.clear) {
       calc.stackValue = NaN;
       calc.pendingOperator = '';
-      this.clearEntry();
+      clearEntry();
     } else if (btn === operators.backspace) {
       if (calc.decimalPressed) {
         calc.decimalPressed = false;
@@ -71,7 +87,7 @@ export default class Calculadora extends React.Component {
             text = text.substring(0, text.length - 1);
           }
 
-          this.setState({displayText: text});
+          setDisplayText(text);
         }
       }
     } else if (btn === operators.decimal) {
@@ -84,7 +100,7 @@ export default class Calculadora extends React.Component {
       if (isFinite(Number(text))) {
         let num = Number(text);
         num *= -1.0;
-        this.setState({displayText: String(num)});
+        setDisplayText(String(num));
       }
     } else if (
       btn === operators.add ||
@@ -93,13 +109,13 @@ export default class Calculadora extends React.Component {
       btn === operators.divide
     ) {
       if (isFinite(Number(text))) {
-        this.computeAndUpdate(btn);
-        this.setState({displayText: calc.stackValue});
+        computeAndUpdate(btn);
+        setDisplayText(String(calc.stackValue));
       }
     } else if (btn === operators.equals) {
       if (isFinite(Number(text))) {
-        this.computeAndUpdate(btn);
-        this.setState({displayText: calc.stackValue});
+        computeAndUpdate(btn);
+        setDisplayText(String(calc.stackValue));
         calc.stackValue = NaN;
       }
     } else if (!isNaN(Number(btn))) {
@@ -114,24 +130,30 @@ export default class Calculadora extends React.Component {
           calc.decimalPressed = false;
         }
 
-        text += btn;
-        this.setState({displayText: String(Number(text))});
+        // Substituir o zero inicial quando um novo número é digitado
+        if (text === '0') {
+          text = btn;
+        } else {
+          text += btn;
+        }
+
+        setDisplayText(text);
       }
     } else {
       // Error
     }
   };
 
-  clearEntry = () => {
+  const clearEntry = () => {
     calc.decimalPressed = false;
     calc.showingPreviousResult = false;
-    this.setState({displayText: '0'});
+    setDisplayText('0');
   };
 
-  computeAndUpdate = (nextOperator: string) => {
+  const computeAndUpdate = (nextOperator: string) => {
     if (!isNaN(calc.stackValue)) {
       let o1 = calc.stackValue;
-      const o2 = Number(this.state.displayText);
+      const o2 = Number(displayText);
 
       if (calc.pendingOperator === operators.add) {
         o1 = o1 + o2;
@@ -145,85 +167,83 @@ export default class Calculadora extends React.Component {
 
       calc.stackValue = o1;
     } else {
-      const num = Number(this.state.displayText);
+      const num = Number(displayText);
       calc.stackValue = num;
     }
     calc.pendingOperator = nextOperator;
     calc.showingPreviousResult = true;
   };
 
-  render() {
-    return (
-      <LinearGradient colors={['#808080', '#000']} style={styles.container}>
-        <TouchableOpacity style={styles.backButton}>
-          <Image source={require('../../../assets/flecha.png')} style={styles.imageflecha} />
-        </TouchableOpacity>
-        <View style={styles.calculatorContainer}>
-          <View style={styles.textRow}>
-            <Text style={styles.text}>{this.state.displayText}</Text>
-          </View>
-          <View style={styles.buttonRow}>
-            <CalcButton
-              name={operators.clearEntry}
-              onPress={n => this.buttonPress(n)}
-            />
-            <CalcButton
-              name={operators.clear}
-              onPress={n => this.buttonPress(n)}
-            />
-            <CalcButton
-              name={operators.backspace}
-              onPress={n => this.buttonPress(n)}
-            />
-            <CalcButton
-              name={operators.divide}
-              onPress={n => this.buttonPress(n)}
-            />
-          </View>
-          <View style={styles.buttonRow}>
-            <CalcButton name="7" onPress={n => this.buttonPress(n)} />
-            <CalcButton name="8" onPress={n => this.buttonPress(n)} />
-            <CalcButton name="9" onPress={n => this.buttonPress(n)} />
-            <CalcButton
-              name={operators.multiply}
-              onPress={n => this.buttonPress(n)}
-            />
-          </View>
-          <View style={styles.buttonRow}>
-            <CalcButton name="4" onPress={n => this.buttonPress(n)} />
-            <CalcButton name="5" onPress={n => this.buttonPress(n)} />
-            <CalcButton name="6" onPress={n => this.buttonPress(n)} />
-            <CalcButton
-              name={operators.subtract}
-              onPress={n => this.buttonPress(n)}
-            />
-          </View>
-          <View style={styles.buttonRow}>
-            <CalcButton name="1" onPress={n => this.buttonPress(n)} />
-            <CalcButton name="2" onPress={n => this.buttonPress(n)} />
-            <CalcButton name="3" onPress={n => this.buttonPress(n)} />
-            <CalcButton name={operators.add} onPress={n => this.buttonPress(n)} />
-          </View>
-          <View style={styles.buttonRow}>
-            <CalcButton
-              name={operators.sign}
-              onPress={n => this.buttonPress(n)}
-            />
-            <CalcButton name="0" onPress={n => this.buttonPress(n)} />
-            <CalcButton
-              name={operators.decimal}
-              onPress={n => this.buttonPress(n)}
-            />
-            <CalcButton
-              name={operators.equals}
-              onPress={n => this.buttonPress(n)}
-            />
-          </View>
+  return (
+    <LinearGradient colors={['#808080', '#000']} style={styles.container}>
+      <TouchableOpacity style={styles.backButton} onPress={() => navigation.goBack()}>
+        <Image source={require('../../../assets/flecha.png')} style={styles.imageflecha} />
+      </TouchableOpacity>
+      <View style={styles.calculatorContainer}>
+        <View style={styles.textRow}>
+          <Text style={styles.text}>{displayText}</Text>
         </View>
-      </LinearGradient>
-    );
-  }
-}
+        <View style={styles.buttonRow}>
+          <CalcButton
+            name={operators.clearEntry}
+            onPress={buttonPress}
+          />
+          <CalcButton
+            name={operators.clear}
+            onPress={buttonPress}
+          />
+          <CalcButton
+            name={operators.backspace}
+            onPress={buttonPress}
+          />
+          <CalcButton
+            name={operators.divide}
+            onPress={buttonPress}
+          />
+        </View>
+        <View style={styles.buttonRow}>
+          <CalcButton name="7" onPress={buttonPress} />
+          <CalcButton name="8" onPress={buttonPress} />
+          <CalcButton name="9" onPress={buttonPress} />
+          <CalcButton
+            name={operators.multiply}
+            onPress={buttonPress}
+          />
+        </View>
+        <View style={styles.buttonRow}>
+          <CalcButton name="4" onPress={buttonPress} />
+          <CalcButton name="5" onPress={buttonPress} />
+          <CalcButton name="6" onPress={buttonPress} />
+          <CalcButton
+            name={operators.subtract}
+            onPress={buttonPress}
+          />
+        </View>
+        <View style={styles.buttonRow}>
+          <CalcButton name="1" onPress={buttonPress} />
+          <CalcButton name="2" onPress={buttonPress} />
+          <CalcButton name="3" onPress={buttonPress} />
+          <CalcButton name={operators.add} onPress={buttonPress} />
+        </View>
+        <View style={styles.buttonRow}>
+          <CalcButton
+            name={operators.sign}
+            onPress={buttonPress}
+          />
+          <CalcButton name="0" onPress={buttonPress} />
+          <CalcButton
+            name={operators.decimal}
+            onPress={buttonPress}
+          />
+          <CalcButton
+            name={operators.equals}
+            onPress={buttonPress}
+          />
+        </View>
+      </View>
+    </LinearGradient>
+  );
+};
 
 const styles = StyleSheet.create({
   container: {
@@ -280,3 +300,5 @@ const styles = StyleSheet.create({
     resizeMode: 'cover',
   },
 });
+
+export default Calculadora;
