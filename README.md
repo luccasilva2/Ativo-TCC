@@ -24,8 +24,7 @@
 
 ### 📸 Prévia do App
 
-> ![Print do app](./screenshot1.png)
-
+> ![Print do app](./print1app.png)> ![Print do app](./print2app.png)
 ---
 
 ### 📦 Instalação Local
